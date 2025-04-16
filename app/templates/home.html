@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-center flex-grow-1">Latest Jobs</h2>
+        {% if current_user.is_authenticated and current_user.role == 'employer' %}
+            <a href="{{ url_for('main.post_job') }}" class="btn btn-success" aria-label="Post a new job">
+                <i class="fa-solid fa-plus"></i> Post a Job
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Job Search Filters -->
+    <form method="GET" action="{{ url_for('main.home') }}" class="row g-3 mb-4">
+        <div class="col-md-4">
+            <label for="location" class="form-label">Location</label>
+            <select class="form-select" id="location" name="location">
+                <option value="">All Locations</option>
+                {% for loc in locations %}
+                    <option value="{{ loc[0] }}" {% if request.args.get('location') == loc[0] %}selected{% endif %}>
+                        {{ loc[0] }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label for="category" class="form-label">Category</label>
+            <select class="form-select" id="category" name="category">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                    <option value="{{ cat[0] }}" {% if request.args.get('category') == cat[0] %}selected{% endif %}>
+                        {{ cat[0] }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label for="company" class="form-label">Company</label>
+            <select class="form-select" id="company" name="company">
+                <option value="">All Companies</option>
+                {% for comp in companies %}
+                    <option value="{{ comp[0] }}" {% if request.args.get('company') == comp[0] %}selected{% endif %}>
+                        {{ comp[0] }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="col-12 text-center">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-search"></i> Search Jobs
+            </button>
+        </div>
+    </form>
+
+    {% if jobs %}
+    <div class="row">
+        {% for job in jobs %}
+        <div class="col-md-4 mb-4">
+            <div class="card animate__animated animate__fadeInUp shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ job.title }}</h5>
+                    <p class="card-text"><strong>Location:</strong> {{ job.location or "Not Provided" }}</p>
+                    <p class="card-text"><strong>Category:</strong> {{ job.category or "Not Specified" }}</p>
+                    {% if job.company and job.company != '' %}
+                        <p class="card-text"><strong>Company:</strong> {{ job.company }}</p>
+                    {% else %}
+                        <p class="card-text"><strong>Company:</strong> Not Specified</p>
+                    {% endif %}
+                    <p class="card-text"><strong>Salary:</strong> 
+                        {% if job.salary %} ${{ job.salary }} {% else %} Not Disclosed {% endif %}
+                    </p>
+                    <p class="card-text">
+                        {{ job.description[:90].rsplit(' ', 1)[0] }}...
+                        <a href="{{ url_for('main.job_detail', job_id=job.id) }}">Read More</a>
+                    </p>
+                    <a href="{{ url_for('main.apply', job_id=job.id) }}" class="btn btn-primary mt-auto w-100"
+                        aria-label="Apply for {{ job.title }}">
+                        <i class="fa-solid fa-paper-plane"></i> Apply Now
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <p class="text-center text-muted">No jobs found for your criteria.</p>
+    {% endif %}
+</div>
+{% endblock %}
+

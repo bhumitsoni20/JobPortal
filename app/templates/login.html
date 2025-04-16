@@ -1,0 +1,77 @@
+{% extends "base.html" %}  
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg animate__animated animate__zoomIn">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Login</h3>
+
+                    <!-- Flash Messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} animate__animated animate__fadeIn">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Login Form -->
+                    <form method="POST" autocomplete="off">
+                        {{ form.hidden_tag() }}  <!-- CSRF Token for security -->
+
+                        <div class="mb-3">
+                            <label for="emailField" class="form-label"><i class="bi bi-envelope"></i> {{ form.email.label }}</label>
+                            {{ form.email(class="form-control", id="emailField", placeholder="Enter your email", autofocus=true) }}
+                            {% for error in form.email.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="passwordField" class="form-label"><i class="bi bi-lock"></i> {{ form.password.label }}</label>
+                            <div class="input-group">
+                                {{ form.password(class="form-control", id="passwordField", placeholder="Enter your password") }}
+                                <button class="btn btn-outline-secondary" type="button" id="togglePasswordBtn" aria-label="Toggle password visibility">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            {% for error in form.password.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Login</button>
+
+                        <p class="text-center mt-3">
+                            Don't have an account? <a href="{{ url_for('main.register') }}">Register here</a>
+                        </p>
+                        <p class="text-center mt-2">
+                            <a href="{{ url_for('main.forgot_password') }}">Forgot Password?</a>
+                        </p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Password Toggle Script -->
+<script>
+    document.getElementById("togglePasswordBtn").addEventListener("click", function () {
+        var passwordField = document.getElementById("passwordField");
+        var icon = this.querySelector("i");
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            icon.classList.replace("bi-eye", "bi-eye-slash");
+        } else {
+            passwordField.type = "password";
+            icon.classList.replace("bi-eye-slash", "bi-eye");
+        }
+    });
+</script>
+
+{% endblock %}

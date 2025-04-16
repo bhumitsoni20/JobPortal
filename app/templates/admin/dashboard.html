@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Admin Dashboard</h2>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} animate__animated animate__fadeIn">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Post Job Button -->
+    <div class="text-end mb-3">
+        <a href="{{ url_for('admin_bp.post_job') }}" class="btn btn-primary">Post a New Job</a>
+    </div>
+
+    <!-- Job Listings Table -->
+    <h3 class="mt-4">Job Listings</h3>
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Job Title</th>
+                <th>Description</th>
+                <th>Salary</th>
+                <th>Location</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for job in jobs %}
+            <tr>
+                <td>{{ job.id }}</td>
+                <td>{{ job.title|default("N/A") }}</td>
+                <td>{{ job.description[:50] }}...</td>  
+                <td>${{ job.salary|default("0.00") }}</td>
+                <td>{{ job.location|default("N/A") }}</td>
+                <td>
+                    <form action="{{ url_for('admin_bp.delete_job', job_id=job.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this job?');">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">  <!-- ✅ Ensure CSRF token -->
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center">No jobs posted yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table> 
+
+    <!-- Job Applications Table -->
+    <h3 class="mt-4">Job Applications</h3>
+    <table class="table table-striped table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Job Title</th>
+                <th>Applicant Name</th>
+                <th>Email</th>
+                <th>Resume</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for application in applications %}
+            <tr>
+                <td>{{ application.id }}</td>
+                <td>{{ application.job.title if application.job else "<em>Job Not Found</em>" | safe }}</td>
+                <td>{{ application.applicant.username if application.applicant else "<em>User Not Found</em>" | safe }}</td>
+                <td>{{ application.applicant.email if application.applicant else "<em>Email Not Available</em>" | safe }}</td>
+                <td>
+                    {% if application.resume %}
+                    <a href="{{ url_for('resume_bp.view_resume', filename=application.resume) }}" target="_blank">
+                        View Resume
+                    </a>
+                    {% else %}
+                        No Resume Uploaded
+                    {% endif %}
+                </td>
+                <td>
+                    <form action="{{ url_for('admin_bp.delete_application', application_id=application.id) }}" method="POST">
+                        {{ form.hidden_tag() }}  
+                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center">No applications received yet.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table> 
+</div>
+{% endblock %}

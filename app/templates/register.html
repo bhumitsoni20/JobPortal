@@ -1,0 +1,107 @@
+{% extends "base.html" %}  
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-lg animate__animated animate__zoomIn">
+                <div class="card-body">
+                    <h3 class="card-title text-center mb-4">Register</h3>
+
+                    <!-- Flash Messages -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ category }} animate__animated animate__fadeIn">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+
+                    <!-- Registration Form -->
+                    <form method="POST" autocomplete="off">
+                        {{ form.hidden_tag() }}  <!-- CSRF Token for security -->
+                        
+                        <div class="mb-3">
+                            <label for="usernameField" class="form-label"><i class="bi bi-person"></i> {{ form.username.label }}</label>
+                            {{ form.username(class="form-control", id="usernameField", placeholder="Enter your username", autofocus=true) }}
+                            {% for error in form.username.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="emailField" class="form-label"><i class="bi bi-envelope"></i> {{ form.email.label }}</label>
+                            {{ form.email(class="form-control", id="emailField", placeholder="Enter your email") }}
+                            {% for error in form.email.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="passwordField" class="form-label"><i class="bi bi-lock"></i> {{ form.password.label }}</label>
+                            <div class="input-group">
+                                {{ form.password(class="form-control", id="passwordField", placeholder="Create a password") }}
+                                <button class="btn btn-outline-secondary" type="button" id="togglePasswordBtn" aria-label="Toggle password visibility">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            {% for error in form.password.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="confirmPasswordField" class="form-label"><i class="bi bi-lock"></i> {{ form.confirm_password.label }}</label>
+                            <div class="input-group">
+                                {{ form.confirm_password(class="form-control", id="confirmPasswordField", placeholder="Confirm your password") }}
+                                <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPasswordBtn" aria-label="Toggle confirm password visibility">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </div>
+                            {% for error in form.confirm_password.errors %}
+                                <div class="text-danger small">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100">Register</button>
+                    </form>
+
+                    <p class="text-center mt-3">
+                        Already have an account? <a href="{{ url_for('main.login') }}">Login here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Password Toggle Script -->
+<script>
+    document.getElementById("togglePasswordBtn").addEventListener("click", function () {
+        var passwordField = document.getElementById("passwordField");
+        var icon = this.querySelector("i");
+        if (passwordField.type === "password") {
+            passwordField.type = "text";
+            icon.classList.replace("bi-eye", "bi-eye-slash");
+        } else {
+            passwordField.type = "password";
+            icon.classList.replace("bi-eye-slash", "bi-eye");
+        }
+    });
+
+    document.getElementById("toggleConfirmPasswordBtn").addEventListener("click", function () {
+        var confirmPasswordField = document.getElementById("confirmPasswordField");
+        var icon = this.querySelector("i");
+        if (confirmPasswordField.type === "password") {
+            confirmPasswordField.type = "text";
+            icon.classList.replace("bi-eye", "bi-eye-slash");
+        } else {
+            confirmPasswordField.type = "password";
+            icon.classList.replace("bi-eye-slash", "bi-eye");
+        }
+    });
+</script>
+
+{% endblock %}
